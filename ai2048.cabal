@@ -1,0 +1,41 @@
+name:                 ai2048
+version:              0.1.0.0
+synopsis:
+-- description:
+-- license:
+-- license-file:
+homepage:
+author:               Akshay Mankar
+maintainer:           itsakshaymankar@gmail.com
+category:
+-- copyright:
+build-type:           Simple
+-- extra-source-files:
+cabal-version:        >=1.10
+
+library
+  exposed-modules:      Game2048
+  build-depends:        base >= 4.7 && < 5
+                      , random
+                      , split
+  hs-source-dirs:       lib
+  default-language:     Haskell2010
+
+executable ai2048
+  main-is:              Main.hs
+  -- other-modules:
+  -- other-extensions:
+  build-depends:        base >= 4.7 && < 5
+                      , ai2048
+  hs-source-dirs:       app
+  default-language:     Haskell2010
+
+test-suite spec
+  build-depends:  base
+                , hspec
+                , ai2048
+  hs-source-dirs: test
+  main-is: Spec.hs
+  Type: exitcode-stdio-1.0
+
+
