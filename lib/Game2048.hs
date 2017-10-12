@@ -63,7 +63,7 @@ moveLeft xs = compactHorizontal ++ zeros compactHorizontal where
 
 moveRight :: [Int] -> [Int]
 moveRight xs = zeros compactHorizontal ++ compactHorizontal where
-  compactHorizontal = addRow $ nonZeros xs
+  compactHorizontal = reverse $ addRow $ reverse $ nonZeros xs
 
 
 shiftBoard :: GameBoard -> Move -> GameBoard
@@ -79,7 +79,9 @@ twoOrFour = do
                else return 2
 
 zeroPositions :: GameBoard -> [Int]
-zeroPositions g = fst $ foldl (\(xs, i) x -> if x == 0 then (xs ++ [i], i+1) else (xs, i+1)) ([], 0) (concat $ toMatrix g)
+zeroPositions g = fst $ foldl accumulatePositionsOfZero ([], 0) (concat $ toMatrix g) where
+  accumulatePositionsOfZero (xs, i)  0 = (xs ++ [i], i+1)
+  accumulatePositionsOfZero (xs, i)  _ = (xs, i+1)
 
 placeAt :: GameBoard -> Int -> Int -> GameBoard
 placeAt g position n = fromMatrix $ chunksOf 4 replacedFlatboard  where

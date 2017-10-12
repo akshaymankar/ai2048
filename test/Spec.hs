@@ -35,6 +35,9 @@ main = hspec $ do
       it "should add same adjacent numbers" $ do
         moveLeft [2, 2, 0, 0] `shouldBe` [4, 0 , 0 , 0]
 
+      it "should add left most numbers first" $ do
+        moveLeft [0, 2, 2, 2] `shouldBe` [4, 2 , 0 , 0]
+
     describe "moveRight" $ do
       it "should not do anything to empty row" $ do
         moveRight [0, 0, 0, 0] `shouldBe` [0, 0, 0, 0]
@@ -48,6 +51,10 @@ main = hspec $ do
 
       it "should add same adjacent numbers" $ do
         moveRight [0, 2, 2, 0] `shouldBe` [0, 0 , 0 , 4]
+
+      it "should add right most numbers first" $ do
+        moveRight [0, 2, 2, 2] `shouldBe` [0, 0 , 2 , 4]
+
 
     describe "shiftBoard" $ do
       describe "moveDown" $ do
@@ -64,6 +71,11 @@ main = hspec $ do
           let expectedGameboard = fromMatrix [[0,0,0,0],[0,0,0,0],[0,0,8,0],[4,2,2,16]]
           shiftBoard gameboard MoveDown `shouldBe` expectedGameboard
 
+        it "should add the bottom most numbers first" $ do
+          let gameboard = fromMatrix [[0,0,0,0],[0,0,0,2],[0,0,0,2],[0,0,0,2]]
+          let expectedGameboard = fromMatrix [[0,0,0,0],[0,0,0,0],[0,0,0,2],[0,0,0,4]]
+          shiftBoard gameboard MoveDown `shouldBe` expectedGameboard
+
       describe "moveUp" $ do
         it "should not do anything to empty board" $ do
           shiftBoard emptyGameBoard MoveUp `shouldBe` emptyGameBoard
@@ -76,6 +88,11 @@ main = hspec $ do
         it "should add the adjacent equal numbers" $ do
           let gameboard = fromMatrix [[0,0,4,16],[2,0,4,0],[2,2,2,0],[0,0,0,0]]
           let expectedGameboard = fromMatrix [[4,2,8,16],[0,0,2,0],[0,0,0,0],[0,0,0,0]]
+          shiftBoard gameboard MoveUp `shouldBe` expectedGameboard
+
+        it "should add the top most numbers first" $ do
+          let gameboard = fromMatrix [[0,0,0,0],[0,0,0,2],[0,0,0,2],[0,0,0,2]]
+          let expectedGameboard = fromMatrix [[0,0,0,4],[0,0,0,2],[0,0,0,0],[0,0,0,0]]
           shiftBoard gameboard MoveUp `shouldBe` expectedGameboard
 
     describe "placeAt" $ do
