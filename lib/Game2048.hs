@@ -12,6 +12,7 @@ newtype GameBoard = GameBoard [GameRow]
   deriving Eq
 
 data Move = MoveRight | MoveLeft | MoveUp | MoveDown
+  deriving (Eq, Show)
 
 emptyRow :: GameRow
 emptyRow = GameRow [0, 0, 0, 0]

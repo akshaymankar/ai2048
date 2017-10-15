@@ -6,8 +6,11 @@ import Control.Applicative (pure)
 import System.IO.Unsafe
 
 newtype Neuron = Neuron { coefficients :: [Float] }
+  deriving Show
 newtype Layer = Layer { neurons :: [Neuron] }
+  deriving Show
 newtype Brain = Brain [Layer]
+  deriving Show
 
 value :: [Float] -> Neuron -> Float
 value ns (Neuron cs) = sum $ zipWith (*) ns cs
@@ -27,5 +30,5 @@ generateRandomNeuron n = Neuron <$> replicateM n (randomRIO (0,1))
 generateRandomLayer :: Int -> Int -> IO Layer
 generateRandomLayer inputNeurons outputNeurons = Layer <$> replicateM outputNeurons (generateRandomNeuron inputNeurons)
 
-generateRandomBrain :: [Int] -> IO Brain
-generateRandomBrain layers = Brain <$> zipWithM generateRandomLayer (1:layers) layers
+generateRandomBrain :: Int -> [Int] -> IO Brain
+generateRandomBrain inputs layers = Brain <$> zipWithM generateRandomLayer (inputs:layers) layers
