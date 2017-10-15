@@ -25,38 +25,37 @@ spec = do
 
   describe "moveLeft" $ do
     it "should not do anything to empty row" $ do
-      moveLeft [0, 0, 0, 0] `shouldBe` [0, 0, 0, 0]
+      moveLeft [0, 0, 0, 0] `shouldBe` ([0, 0, 0, 0], 0)
 
     it "should remove all the zeros from the left" $ do
-      moveLeft [0, 0, 2, 0] `shouldBe` [2, 0, 0, 0]
+      moveLeft [0, 0, 2, 0] `shouldBe` ([2, 0, 0, 0], 0)
     it "should retain all the non zeros" $ do
-      moveLeft [0, 4, 2, 8] `shouldBe` [4, 2, 8, 0]
+      moveLeft [0, 4, 2, 8] `shouldBe` ([4, 2, 8, 0], 0)
     it "should remove zeros between non zeros" $ do
-      moveLeft [0, 4, 0, 8] `shouldBe` [4, 8, 0, 0]
+      moveLeft [0, 4, 0, 8] `shouldBe` ([4, 8, 0, 0], 0)
 
     it "should add same adjacent numbers" $ do
-      moveLeft [2, 2, 0, 0] `shouldBe` [4, 0 , 0 , 0]
+      moveLeft [2, 2, 0, 0] `shouldBe` ([4, 0 , 0 , 0], 0)
 
     it "should add left most numbers first" $ do
-      moveLeft [0, 2, 2, 2] `shouldBe` [4, 2 , 0 , 0]
+      moveLeft [0, 2, 2, 2] `shouldBe` ([4, 2 , 0 , 0], 0)
 
   describe "moveRight" $ do
     it "should not do anything to empty row" $ do
-      moveRight [0, 0, 0, 0] `shouldBe` [0, 0, 0, 0]
+      moveRight [0, 0, 0, 0] `shouldBe` ([0, 0, 0, 0], 0)
 
     it "should remove all the zeros from the right" $ do
-      moveRight [0, 0, 2, 0] `shouldBe` [0, 0, 0, 2]
+      moveRight [0, 0, 2, 0] `shouldBe` ([0, 0, 0, 2], 0)
     it "should retain all the non zeros" $ do
-      moveRight [4, 2, 8,0] `shouldBe` [0, 4, 2, 8]
+      moveRight [4, 2, 8,0] `shouldBe` ([0, 4, 2, 8], 0)
     it "should remove zeros between non zeros" $ do
-      moveRight [0, 4, 0, 8] `shouldBe` [0, 0, 4, 8]
+      moveRight [0, 4, 0, 8] `shouldBe` ([0, 0, 4, 8], 0)
 
     it "should add same adjacent numbers" $ do
-      moveRight [0, 2, 2, 0] `shouldBe` [0, 0 , 0 , 4]
+      moveRight [0, 2, 2, 0] `shouldBe` ([0, 0 , 0 , 4], 0)
 
     it "should add right most numbers first" $ do
-      moveRight [0, 2, 2, 2] `shouldBe` [0, 0 , 2 , 4]
-
+      moveRight [0, 2, 2, 2] `shouldBe` ([0, 0 , 2 , 4], 0)
 
   describe "shiftBoard" $ do
     describe "moveDown" $ do

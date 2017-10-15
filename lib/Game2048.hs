@@ -8,7 +8,7 @@ import Data.List.Split
 newtype GameRow = GameRow [Int]
   deriving Eq
 
-newtype GameBoard = GameBoard [GameRow]
+data GameBoard = GameBoard { rows :: [GameRow], penalty :: Int }
   deriving Eq
 
 data Move = MoveRight | MoveLeft | MoveUp | MoveDown
@@ -18,16 +18,16 @@ emptyRow :: GameRow
 emptyRow = GameRow [0, 0, 0, 0]
 
 emptyGameBoard :: GameBoard
-emptyGameBoard = GameBoard [emptyRow, emptyRow, emptyRow, emptyRow]
+emptyGameBoard = GameBoard [emptyRow, emptyRow, emptyRow, emptyRow] 0
 
 initialBoard :: IO GameBoard
 initialBoard = addRandomNumber emptyGameBoard
 
 fromMatrix :: [[Int]] -> GameBoard
-fromMatrix xss = GameBoard $ map GameRow xss
+fromMatrix xss = GameBoard (map GameRow xss) 0
 
 toMatrix :: GameBoard -> [[Int]]
-toMatrix (GameBoard rows) = map unwrap rows
+toMatrix (GameBoard rows _) = map unwrap rows
 
 unwrap :: GameRow -> [Int]
 unwrap (GameRow xs) = xs
@@ -39,7 +39,8 @@ instance Show GameRow where
       freeSpaces = replicate (spaces - length strNum) ' '
 
 instance Show GameBoard where
-  show (GameBoard rows) = replicate 29 '-' ++ "\n" ++ intercalate "\n" (fmap show rows) ++ "\n" ++ replicate 29 '-'
+  show (GameBoard rows penalty) =
+    replicate 29 '-' ++ "\n" ++ intercalate "\n" (fmap show rows) ++ "\n" ++ replicate 29 '-' ++ "\nPenalty: " ++ show penalty ++ "\n" ++ replicate 29 '-'
 
 doAddition :: ([Int], Int) -> Int -> ([Int], Int)
 doAddition (xs, last) current | last == 0 = (xs, current)
@@ -58,20 +59,20 @@ nonZeros = filter (/= 0)
 zeros :: [Int] -> [Int]
 zeros xs = replicate (4 - length xs) 0
 
-moveLeft :: [Int] -> [Int]
-moveLeft xs = compactHorizontal ++ zeros compactHorizontal where
+moveLeft :: [Int] -> ([Int], Int)
+moveLeft xs = (compactHorizontal ++ zeros compactHorizontal, 0) where
   compactHorizontal = addRow $ nonZeros xs
 
-moveRight :: [Int] -> [Int]
-moveRight xs = zeros compactHorizontal ++ compactHorizontal where
+moveRight :: [Int] -> ([Int], Int)
+moveRight xs = (zeros compactHorizontal ++ compactHorizontal, 0) where
   compactHorizontal = reverse $ addRow $ reverse $ nonZeros xs
 
 
 shiftBoard :: GameBoard -> Move -> GameBoard
-shiftBoard (GameBoard rows) MoveLeft = GameBoard $ map (GameRow . moveLeft . unwrap) rows
-shiftBoard (GameBoard rows) MoveRight = GameBoard $ map (GameRow . moveRight . unwrap) rows
-shiftBoard (GameBoard rows) MoveDown = GameBoard $ map GameRow $ transpose $ map moveRight $ transpose $ map unwrap rows
-shiftBoard (GameBoard rows) MoveUp = GameBoard $ map GameRow $ transpose $ map moveLeft $ transpose $ map unwrap rows
+shiftBoard (GameBoard rows penalty) MoveLeft  = fromMatrix $ map (fst . moveLeft . unwrap) rows
+shiftBoard (GameBoard rows penalty) MoveRight = fromMatrix $ map (fst . moveRight . unwrap) rows
+shiftBoard (GameBoard rows penalty) MoveDown  = fromMatrix $ transpose $ map (fst . moveRight) $ transpose $ map unwrap rows
+shiftBoard (GameBoard rows penalty) MoveUp    = fromMatrix $ transpose $ map (fst . moveLeft) $ transpose $ map unwrap rows
 
 twoOrFour :: IO Int
 twoOrFour = do
@@ -107,4 +108,4 @@ step board move = finalBoard where
                                         else addRandomNumber shiftedBoard
 
 score :: GameBoard -> Int
-score = maximum . concat . toMatrix
+score = sum . concat . toMatrix
