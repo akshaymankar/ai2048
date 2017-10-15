@@ -17,6 +17,7 @@ library
   exposed-modules:      Game2048
                       , Brain
                       , AI2048
+                      , AIWorld
   build-depends:        base >= 4.7 && < 5
                       , random
                       , split

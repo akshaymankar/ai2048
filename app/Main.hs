@@ -4,14 +4,16 @@ import Game2048
 import System.IO
 import AI2048
 import Brain
+import AIWorld
+import Control.Monad
 
 main :: IO ()
 main = do
   g <- initialBoard
   print g
-  b <- generateRandomBrain 16 [20, 4]
-  newG <- playGame g b 3
-  print newG
+  w <- generateAIWorld 50 16 [20, 4]
+  bs <- sortedScores w g
+  print bs
   --hSetBuffering stdin NoBuffering
   --humanGameLoop g
 

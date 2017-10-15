@@ -106,3 +106,5 @@ step board move = finalBoard where
   finalBoard = if shiftedBoard == board then pure board
                                         else addRandomNumber shiftedBoard
 
+score :: GameBoard -> Int
+score = maximum . concat . toMatrix
