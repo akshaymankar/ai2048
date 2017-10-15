@@ -5,6 +5,12 @@ import Brain
 import GHC.Exts
 import System.IO.Unsafe
 
+playGame :: GameBoard -> Brain -> Int -> IO GameBoard
+playGame g b 0 = pure g
+playGame g b turnsRemaining = do
+  newG <- step g $ nextStep g b
+  playGame newG b (turnsRemaining - 1)
+
 nextStep :: GameBoard -> Brain -> Move
 nextStep g b = readAction $ stimulate (toStimulus g) b
 
