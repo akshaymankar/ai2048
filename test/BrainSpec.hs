@@ -8,6 +8,7 @@ import Control.Monad
 
 {-# ANN module ("HLint: ignore Redundant do"::String) #-}
 {-# ANN module ("HLint: ignore Use head"::String) #-}
+{-# ANN module ("HLint: ignore Reduce duplication"::String) #-}
 
 shouldApproxEqualEach :: (?epsilon :: Float) => [Float] -> [Float] -> IO ()
 shouldApproxEqualEach xs ys = mconcat <$> zipWithM (@~?) xs ys
@@ -57,5 +58,30 @@ spec = let ?epsilon = 0.000001 in do
       numberOfCoefficientsOfNeurons (layers !! 1) `shouldBe` [4, 4]
       numberOfCoefficientsOfNeurons (layers !! 2) `shouldBe` [2, 2, 2]
       numberOfCoefficientsOfNeurons (layers !! 3) `shouldBe` [3]
+  describe "GenerateEnhancedBrain" $ do
+    it "should generate have same number of layers as input brains" $ do
+      inputBrain <- generateRandomBrain 1 [4, 2, 3, 1]
+      (Brain layers) <- generateEnhancedBrain inputBrain inputBrain
+      length layers `shouldBe` 4
+    it "should generate layers with same number of neurons as input brains" $ do
+      inputBrain <- generateRandomBrain 1 [4, 2, 3, 1]
+      (Brain layers) <- generateEnhancedBrain inputBrain inputBrain
+      length (neurons $ head layers) `shouldBe` 4
+      length (neurons $ layers !! 1) `shouldBe` 2
+      length (neurons $ layers !! 2) `shouldBe` 3
+    it "should generate neurons with coefficients for previous layers" $ do
+      inputBrain <- generateRandomBrain 1 [4, 2, 3, 1]
+      (Brain layers) <- generateEnhancedBrain inputBrain inputBrain
+      numberOfCoefficientsOfNeurons (layers !! 0) `shouldBe` [1, 1, 1, 1]
+      numberOfCoefficientsOfNeurons (layers !! 1) `shouldBe` [4, 4]
+      numberOfCoefficientsOfNeurons (layers !! 2) `shouldBe` [2, 2, 2]
+      numberOfCoefficientsOfNeurons (layers !! 3) `shouldBe` [3]
+
+  describe "crossover" $ do
+    it "should generate n children for each pair" $ do
+      b1 <- generateRandomBrain 1 [4, 2, 3, 1]
+      b2 <- generateRandomBrain 1 [4, 2, 3, 1]
+      newBrains <- crossover [b1, b2] [b1, b2] 2
+      length newBrains `shouldBe` 4
 
 numberOfCoefficientsOfNeurons layer = map (length . coefficients) (neurons layer)

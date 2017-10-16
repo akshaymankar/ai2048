@@ -7,7 +7,7 @@ import System.IO.Unsafe
 import AIWorld
 
 instance AIProblem GameBoard where
-  fitness g b = score <$> playGame g 100 b
+  fitness g b = score <$> playGame g 1000 b
 
 playGame :: GameBoard -> Int -> Brain -> IO GameBoard
 playGame g 0 _ = pure g

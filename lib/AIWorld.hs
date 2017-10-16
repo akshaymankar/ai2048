@@ -22,4 +22,19 @@ sortedScores world problem = map snd <$> sortedBrainsAndScores world problem
 sortedBrainsAndScores :: AIProblem a => AIWorld -> a -> IO [(Brain, Int)]
 sortedBrainsAndScores (AIWorld bs) work = do
   scores <- mapM (fitness work) bs
-  return $ sortWith snd $ zip bs scores
+  return $ reverse $ sortWith snd $ zip bs scores
+
+population :: AIWorld -> Int
+population (AIWorld bs) = length bs
+
+-- Keeps top 20% brains, crosses over top 40% brains with each other to get 80% of next world
+nextWorld :: AIProblem a => a -> AIWorld -> IO AIWorld
+nextWorld p w = AIWorld <$> do
+  brainsAndScores <- sortedBrainsAndScores w p
+  print $ map snd brainsAndScores
+  let n = length brainsAndScores
+      sbs = map fst brainsAndScores
+      fortyPercentish = ceiling (0.4 * toRational n)
+      notCrossedOver = n - (2 * fortyPercentish)
+  crossedOver <- crossover (take fortyPercentish sbs) (take fortyPercentish sbs) 2
+  return $ take notCrossedOver sbs ++ crossedOver
