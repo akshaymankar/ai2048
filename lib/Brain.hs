@@ -6,7 +6,7 @@ import Control.Applicative (pure)
 import System.IO.Unsafe
 import System.Random.Shuffle
 
-newtype Neuron = Neuron { coefficients :: [Float] }
+data Neuron = Neuron { weights :: [Float], bias :: Float }
   deriving Show
 newtype Layer = Layer { neurons :: [Neuron] }
   deriving Show
@@ -14,7 +14,7 @@ newtype Brain = Brain { layers :: [Layer] }
   deriving Show
 
 value :: [Float] -> Neuron -> Float
-value ns (Neuron cs) = sum $ zipWith (*) ns cs
+value ns (Neuron ws bias) = sigmoid $ bias + sum (zipWith (*) ns ws)
 
 class Stimulatable a where
   stimulate :: [Float] -> a -> [Float]
@@ -41,8 +41,13 @@ pick1 x y = do
   if returnX then return x
              else return y
 
+sigmoid :: Float -> Float
+sigmoid x = 1 / (1 + exp (-x))
+
 instance Mateable Neuron where
-  mate (Neuron cs1) (Neuron cs2) = Neuron <$> zipWithM pick1 cs1 cs2
+  mate (Neuron cs1 b1) (Neuron cs2 b2) = do
+    ws <- zipWithM pick1 cs1 cs2
+    return $ Neuron ws ((b1 + b2)/2)
 
 instance Mateable Layer where
   mate (Layer ns1) (Layer ns2) = Layer <$> zipWithM mate ns1 ns2
@@ -51,7 +56,10 @@ instance Mateable Brain where
   mate (Brain ls1) (Brain ls2) = Brain <$> zipWithM mate ls1 ls2
 
 generateRandomNeuron :: Int -> IO Neuron
-generateRandomNeuron n = Neuron <$> replicateM n (randomRIO (0,1))
+generateRandomNeuron n = do
+  ws <- replicateM n (randomRIO (0,1))
+  b <- randomIO
+  return $ Neuron ws b
 
 generateRandomLayer :: Int -> Int -> IO Layer
 generateRandomLayer inputNeurons outputNeurons = Layer <$> replicateM outputNeurons (generateRandomNeuron inputNeurons)
@@ -61,7 +69,7 @@ generateRandomBrain inputs layers = Brain <$> zipWithM generateRandomLayer (inpu
 
 inputs :: Brain -> Int
 inputs (Brain []) = -1
-inputs (Brain (l:_)) = (length . coefficients . head  . neurons) l
+inputs (Brain (l:_)) = (length . weights . head  . neurons) l
 
 layerLengths :: Brain -> [Int]
 layerLengths (Brain ls) = map (length . neurons) ls
